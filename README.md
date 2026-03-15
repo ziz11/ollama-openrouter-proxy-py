@@ -1,74 +1,117 @@
 # Ollama OpenRouter Proxy (Python)
 
-Легковесный прокси-сервер на Python, который позволяет использовать любые модели **OpenRouter** (включая новейшие бесплатные) в приложениях, предназначенных для **Ollama** (Enchanted, Page Assist, Continue, Open WebUI и др.).
+**Languages:** [English](README.md) | [Русский](README_RU.md)
 
-## 🚀 Основные возможности
-- **Полная совместимость с Ollama API**: Работает как "дроп-ин" замена на порту `11434`.
-- **Поддержка стриминга (Streaming)**: Текст появляется по мере генерации, как в ChatGPT.
-- **Автоматический список моделей**: Прокси сам подтягивает все доступные модели из OpenRouter.
-- **Кэширование**: Список моделей обновляется раз в 10 минут, не замедляя работу интерфейса.
-- **Поддержка Vision моделей**: Работает с моделями, понимающими изображения (например, Gemma 3).
+A lightweight Python proxy that lets Ollama-compatible apps use models from OpenRouter, including free models.
 
-## 🛠 Быстрая настройка
+## Features
 
-### 1. Подготовка ключа
-Создайте файл `.env` в папке проекта и добавьте ваш API-ключ от [OpenRouter](https://openrouter.ai/keys):
-```env
-OPENROUTER_API_KEY=sk-or-v1-ваш-длинный-ключ
-```
+- Ollama-compatible API on `http://localhost:11434`
+- Streaming chat responses
+- Automatic OpenRouter model listing via `/api/tags`
+- Model list caching for 10 minutes
+- Vision-capable models work if supported by the selected app/model
+- Simple terminal chat client for testing
 
-### 2. Запуск сервера
-Используйте готовый скрипт в вашей папке Documents:
+## Quick Start
+
+### 1. Install dependencies
+
 ```bash
-~/Documents/run_ollama_proxy.sh
+pip install -r requirements.txt
 ```
-Сервер будет доступен по адресу: `http://localhost:11434`
 
-## 📱 Как использовать в приложениях
-В любом Ollama-совместимом приложении укажите:
-- **Base URL / Server Address**: `http://localhost:11434`
-- **Model**: Выберите из выпадающего списка (прокси сам отдаст все модели OpenRouter).
+### 2. Add your OpenRouter API key
 
-## 🎁 Актуальные бесплатные модели (Free Models)
-Просто скопируйте ID и вставьте в поле выбора модели:
+Create a `.env` file in the project root:
 
-| Название модели | ID для использования | Особенности |
-| :--- | :--- | :--- |
-| **Llama 3.3 70B** | `meta-llama/llama-3.3-70b-instruct:free` | Самая мощная универсальная |
-| **Hermes 3 405B** | `nousresearch/hermes-3-llama-3.1-405b:free` | Огромная и очень умная |
-| **DeepSeek R1** | `deepseek/deepseek-r1:free` | Лучшая для логики и математики |
-| **Gemini 2.0 Flash** | `google/gemini-2.0-flash-exp:free` | Сверхбыстрая от Google |
-| **Gemma 3 27B** | `google/gemma-3-27b-it:free` | Новинка, понимает изображения |
-| **Qwen 2.5 Coder** | `qwen/qwen-2.5-coder-32b-instruct:free` | Идеальна для программирования |
-| **Mistral Small** | `mistralai/mistral-small-3.1-24b-instruct:free` | Сбалансированная и быстрая |
+```env
+OPENROUTER_API_KEY=sk-or-v1-your-long-key
+```
 
-## 🔍 Полезные команды для проверки
+### 3. Start the proxy
 
-**Проверка связи с прокси:**
+```bash
+python3 ollama_openrouter_proxy.py
+```
+
+The proxy listens on `http://localhost:11434`.
+
+## Use With Ollama Apps
+
+In any Ollama-compatible app, set:
+
+- Base URL / Server Address: `http://localhost:11434`
+- Model: choose any model returned by the proxy
+
+Examples: Enchanted, Page Assist, Continue, Open WebUI.
+
+## Terminal Chat Client
+
+You can test the proxy directly from the terminal:
+
+```bash
+python3 chat.py
+```
+
+The client fetches available models from the proxy and sends chat requests through `/api/chat`.
+When you use `change`, it shows `openrouter/free` plus a curated list of up to 15 known free models that are available right now.
+
+## Useful Commands
+
+Check the proxy status:
+
 ```bash
 curl http://localhost:11434/ping
 ```
 
-**Получить список всех бесплатных моделей:**
+List all available models:
+
+```bash
+curl -s http://localhost:11434/api/tags
+```
+
+List only free models:
+
 ```bash
 curl -s http://localhost:11434/api/tags | python3 -c "import sys, json; print('\n'.join(sorted([m['name'] for m in json.load(sys.stdin)['models'] if ':free' in m['name']])))"
 ```
 
-**Тестовый чат через терминал:**
+## Recommended Free Models
+
+| Model | ID | Notes |
+| :--- | :--- | :--- |
+| OpenRouter Free Router | `openrouter/free` | Automatically picks an available free model |
+| Llama 3.3 70B | `meta-llama/llama-3.3-70b-instruct:free` | Strong general-purpose model |
+| Hermes 3 405B | `nousresearch/hermes-3-llama-3.1-405b:free` | Large and capable |
+| DeepSeek R1 | `deepseek/deepseek-r1:free` | Good for reasoning and math |
+| Gemini 2.0 Flash | `google/gemini-2.0-flash-exp:free` | Fast responses |
+| Gemma 3 27B | `google/gemma-3-27b-it:free` | Vision support |
+| Qwen 2.5 Coder | `qwen/qwen-2.5-coder-32b-instruct:free` | Good for code tasks |
+| Mistral Small 3.1 | `mistralai/mistral-small-3.1-24b-instruct:free` | Balanced and efficient |
+| Llama 3.2 3B | `meta-llama/llama-3.2-3b-instruct:free` | Lightweight general-purpose model |
+| Llama 3.2 1B | `meta-llama/llama-3.2-1b-instruct:free` | Very small and fast |
+| Gemma 2 9B | `google/gemma-2-9b-it:free` | Compact instruction model |
+| Gemma 2 27B | `google/gemma-2-27b-it:free` | Larger Gemma variant |
+| Qwen 2.5 72B | `qwen/qwen-2.5-72b-instruct:free` | Strong long-form model |
+| Qwen 2.5 7B | `qwen/qwen-2.5-7b-instruct:free` | Smaller fast Qwen |
+| Phi-3 Medium 128K | `microsoft/phi-3-medium-128k-instruct:free` | Long context model |
+| Llama 3.1 Nemotron 70B | `nvidia/llama-3.1-nemotron-70b-instruct:free` | Nvidia-tuned large model |
+
+## Troubleshooting
+
+If you get `404 page not found` or port `11434` is busy:
+
+1. Quit the original Ollama app if it is running.
+2. Free the port manually if needed:
+
 ```bash
-curl -X POST http://localhost:11434/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"model": "google/gemini-2.0-flash-001", "messages": [{"role": "user", "content": "Привет!"}], "stream": false}'
+lsof -ti:11434 | xargs kill -9
 ```
 
-## ⚠️ Решение проблем
-Если вы видите ошибку `404 page not found` или порт занят:
-1. Выключите оригинальную Ollama (иконка в трее -> Quit).
-2. Если не помогает, очистите порт вручную:
-   ```bash
-   lsof -ti:11434 | xargs kill -9
-   ```
-3. Запустите прокси снова.
+3. Start the proxy again.
 
----
-*Приятного использования!*
+## Notes
+
+- `openrouter/free` is a router provided by OpenRouter that automatically selects an available free model.
+- Specific free models can be temporarily rate-limited, so `openrouter/free` is often the most reliable default choice.
