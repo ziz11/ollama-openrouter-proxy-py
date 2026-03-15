@@ -37,6 +37,19 @@ python3 ollama_openrouter_proxy.py
 
 The proxy listens on `http://localhost:11434`.
 
+## Important
+
+This project intentionally mimics the Ollama API on port `11434`.
+That means it replaces the real Ollama server while it is running.
+
+- If the proxy is running, regular `ollama pull`, `ollama run`, and `ollama list` will not work against the real Ollama daemon.
+- If the real Ollama app is running, this proxy cannot start on port `11434`.
+
+Use one of them at a time:
+
+- Start the proxy when you want Ollama-compatible apps to use OpenRouter.
+- Stop the proxy and run the real Ollama daemon when you want local Ollama models.
+
 ## Use With Ollama Apps
 
 In any Ollama-compatible app, set:
